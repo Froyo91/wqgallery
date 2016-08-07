@@ -2,9 +2,9 @@ package com.wq.photo.widget;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 
 import com.wq.photo.MediaChoseActivity;
 import com.yalantis.ucrop.UCrop;
@@ -45,6 +45,7 @@ public class PickConfig {
     private int statusBarcolor;
     private UCrop.Options options;
     private boolean isSqureCrop;
+    private Fragment fragment;
 
     private PickConfig(Activity context, PickConfig.Builder builder) {
         this.spanCount = builder.spanCount;
@@ -56,6 +57,7 @@ public class PickConfig {
         this.actionBarcolor = builder.actionBarcolor;
         this.options=builder.options;
         this.isSqureCrop=builder.isSqureCrop;
+        this.fragment = builder.fragment;
 
 
         Bundle bundle = new Bundle();
@@ -74,7 +76,12 @@ public class PickConfig {
         } else {
             this.maxPickSize = 1;
         }
-        startPick(context, bundle);
+
+        if (fragment == null) {
+            startPick(context, bundle);
+        } else {
+            startFragmentPick(fragment, bundle);
+        }
     }
 
     private void startPick(Activity context, Bundle bundle) {
@@ -84,6 +91,12 @@ public class PickConfig {
         context.startActivityForResult(intent, PICK_REQUEST_CODE);
     }
 
+    private void startFragmentPick(Fragment fragment, Bundle bundle) {
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_PICK_BUNDLE, bundle);
+        intent.setClass(fragment.getActivity(), MediaChoseActivity.class);
+        fragment.startActivityForResult(intent, PICK_REQUEST_CODE);
+    }
 
     public static class Builder {
 
@@ -96,6 +109,7 @@ public class PickConfig {
         private boolean isSqureCrop=false;
         private int actionBarcolor = Color.parseColor("#03A9F4");
         private int statusBarcolor = Color.parseColor("#0288D1");
+        private Fragment fragment = null;
 
         private UCrop.Options options=null;
 
@@ -156,6 +170,11 @@ public class PickConfig {
 
         public PickConfig.Builder isneedcrop(boolean isneed_crop) {
             this.isneed_crop = isneed_crop;
+            return this;
+        }
+
+        public PickConfig.Builder setFragment(Fragment fragment) {
+            this.fragment = fragment;
             return this;
         }
 
